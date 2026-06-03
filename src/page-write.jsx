@@ -27,17 +27,48 @@ function WritePage({ ctx }) {
     setTimeout(() => outRef.current && outRef.current.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
   };
 
+  const recipientEmail = activeOfficial?.contacts?.email || "";
+  const contactPortal = activeOfficial?.contacts?.form || activeOfficial?.contacts?.site || "";
+  const isSenator = /senate/i.test(activeOfficial?.role || "") || /^sen\./i.test(activeOfficial?.name || "");
+  const isRep = /house|representatives/i.test(activeOfficial?.role || "") || /^rep\./i.test(activeOfficial?.name || "");
+  const portalLabel = isSenator ? "Open Senator's contact portal" : isRep ? "Open Representative's contact portal" : "Open contact form";
+  const portalNote = isSenator
+    ? "Senators take messages through their official contact portal, not a public email."
+    : isRep
+      ? "Representatives take messages through their official contact portal, not a public email."
+      : "This office takes messages through an official contact form.";
+  const portalUrl = contactPortal ? (/^https?:\/\//.test(contactPortal) ? contactPortal : "https://" + contactPortal) : "";
+
   const copy = () => {
-    const text = `Subject: ${email.subject}\n\n${bodyText}`;
+    const toLine = recipientEmail ? `To: ${recipientEmail}\n` : "";
+    const text = `${toLine}Subject: ${email.subject}\n\n${bodyText}`;
     navigator.clipboard && navigator.clipboard.writeText(text);
-    toast("Copied. You're one step from your first connection.");
+    toast(recipientEmail ? "Copied with the address. Paste it into your email app." : "Copied. You're one step from your first connection.");
+  };
+
+  const copyAddress = () => {
+    if (!recipientEmail) return;
+    navigator.clipboard && navigator.clipboard.writeText(recipientEmail);
+    toast("Address copied. Paste it into the \u201cTo\u201d field.");
   };
 
   const openMail = () => {
     const url = "https://mail.google.com/mail/?view=cm&fs=1"
-      + "&to=" + encodeURIComponent(activeOfficial.contacts?.email || "")
+      + "&to=" + encodeURIComponent(recipientEmail)
       + "&su=" + encodeURIComponent(email.subject)
       + "&body=" + encodeURIComponent(bodyText);
+    openTab(url);
+  };
+
+  const openPortal = () => {
+    // The letter can't be injected into a .gov form, so put it on the clipboard
+    // first \u2014 the teen just clicks the message box and pastes.
+    navigator.clipboard && navigator.clipboard.writeText(bodyText);
+    toast("Letter copied. In the form, click the message box and paste (Ctrl/Cmd-V).");
+    setTimeout(() => openTab(portalUrl), 350);
+  };
+
+  const openTab = (url) => {
     const a = document.createElement("a");
     a.href = url;
     a.target = "_blank";
@@ -184,7 +215,26 @@ function WritePage({ ctx }) {
                 </button>
               </div>
               <div className="email-meta">
-                <div className="email-row"><span className="em-lab">To</span><span>{activeOfficial.contacts?.email || activeOfficial.name}</span></div>
+                <div className="email-row">
+                  <span className="em-lab">To</span>
+                  {recipientEmail ? (
+                    <span className="row gap1" style={{ alignItems: "center", flexWrap: "wrap" }}>
+                      <span style={{ fontWeight: 600, color: "var(--blue-deep)" }}>{activeOfficial.name}</span>
+                      <span className="to-email">{recipientEmail}</span>
+                      <button className="linkish small" onClick={copyAddress}><Icon name="copy" size={13} /> Copy address</button>
+                    </span>
+                  ) : portalUrl ? (
+                    <span className="row gap1" style={{ alignItems: "center", flexWrap: "wrap" }}>
+                      <span style={{ fontWeight: 600, color: "var(--blue-deep)" }}>{activeOfficial.name}</span>
+                      <span className="small muted">{portalNote}</span>
+                    </span>
+                  ) : (
+                    <span className="row gap1" style={{ alignItems: "center", flexWrap: "wrap" }}>
+                      <span style={{ fontWeight: 600, color: "var(--blue-deep)" }}>{activeOfficial.name}</span>
+                      <span className="small muted">No address on file — look it up on their official page before sending.</span>
+                    </span>
+                  )}
+                </div>
                 <div className="email-row"><span className="em-lab">Subject</span><span style={{ fontWeight: 600, color: "var(--blue-deep)" }}>{email.subject}</span></div>
               </div>
               {editing ? (
@@ -199,9 +249,18 @@ function WritePage({ ctx }) {
 
             {/* actions */}
             <div className="email-actions">
-              <Button icon="copy" onClick={copy}>Copy email</Button>
-              <Button variant="secondary" icon="send" onClick={openMail}>Open in Gmail</Button>
+              <Button icon="copy" onClick={copy}>Copy letter</Button>
+              {recipientEmail ? (
+                <Button variant="secondary" icon="send" onClick={openMail}>Open in Gmail</Button>
+              ) : portalUrl ? (
+                <Button variant="secondary" icon="send" onClick={openPortal}>{portalLabel}</Button>
+              ) : null}
             </div>
+            {!recipientEmail && portalUrl && (
+              <p className="small muted" style={{ marginTop: 10, maxWidth: 560 }}>
+                <Icon name="info" size={14} style={{ color: "var(--blue)" }} /> {activeOfficial.name.split(" ").slice(0, 2).join(" ")}'s office only accepts messages through their own secure portal, so we can't auto-fill it for you. We'll copy your letter to the clipboard when the portal opens — just click the message box and paste.
+              </p>
+            )}
           </div>
         )}
       </div>

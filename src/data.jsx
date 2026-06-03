@@ -128,19 +128,34 @@ async function loadLegislators() {
   return _legPromise;
 }
 
+/* Resolve a member's actual contact page. The public dataset only carries a
+   contact_form for a handful of members; for everyone else it lists just the
+   home URL. Both chambers run a standard template whose contact page lives at
+   /contact/ (e.g. nadler.house.gov/contact/, schiff.senate.gov/contact/), so we
+   derive that rather than dumping the user on the home page. */
+function memberContactUrl(term) {
+  if (term.contact_form) return term.contact_form;
+  const home = term.url || "";
+  if (/\.(senate|house)\.gov\/?$/i.test(home)) return home.replace(/\/+$/, "") + "/contact/";
+  return "";
+}
+// Back-compat alias
+const senatorContactUrl = memberContactUrl;
+
 async function fetchSenators(stateAbbr) {
   const leg = await loadLegislators();
   const out = [];
   for (const p of leg) {
     const term = p.terms[p.terms.length - 1];
     if (term && term.type === "sen" && term.state === stateAbbr) {
-      const url = term.contact_form || term.url || "";
+      const form = senatorContactUrl(term);
+      const url = form || term.url || "";
       out.push({
         id: "fed-sen-" + (p.id && p.id.bioguide || p.name.last),
         name: "Sen. " + (p.name.official_full || `${p.name.first} ${p.name.last}`),
         role: `U.S. Senate (${stateAbbr})`,
         party: term.party || "",
-        contacts: { email: "", phone: term.phone || "", web: url.replace(/^https?:\/\//, "") },
+        contacts: { email: "", phone: term.phone || "", web: url.replace(/^https?:\/\//, ""), form, site: term.url || "" },
         can: "Votes on national security funding, including the Nonprofit Security Grant Program that helps protect Jewish institutions, and can speak out against antisemitism.",
         best: ["Security funding", "Public support"],
         verified: true,
@@ -153,12 +168,13 @@ async function fetchSenators(stateAbbr) {
 /* Build an official object from a congress-legislators person record */
 function legToOfficial(p, roleLabel, can, best) {
   const t = p.terms[p.terms.length - 1];
-  const url = t.contact_form || t.url || "";
+  const form = memberContactUrl(t);
+  const url = form || t.url || "";
   return {
     id: "leg-" + ((p.id && p.id.bioguide) || p.name.last),
     name: (t.type === "sen" ? "Sen. " : "Rep. ") + (p.name.official_full || `${p.name.first} ${p.name.last}`),
     role: roleLabel, party: t.party || "",
-    contacts: { email: "", phone: t.phone || "", web: url.replace(/^https?:\/\//, "") },
+    contacts: { email: "", phone: t.phone || "", web: url.replace(/^https?:\/\//, ""), form, site: t.url || "" },
     can, best, verified: true,
   };
 }

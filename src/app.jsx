@@ -4,34 +4,34 @@
 const { useState: useS, useEffect: useE } = React;
 
 const ROUTES = [
-  { id: "home", label: "Home" },
-  { id: "how", label: "How It Works" },
-  { id: "find", label: "Find Officials" },
-  { id: "write", label: "Write" },
-];
+{ id: "home", label: "Home" },
+{ id: "how", label: "How It Works" },
+{ id: "find", label: "Find Officials" },
+{ id: "write", label: "Write" }];
+
 const NAV_LINKS = ["how", "find", "write"];
 
 /* ---------- Logo ---------- */
 function Logo({ onClick }) {
   return (
     <div className="logo" onClick={onClick} role="link" tabIndex={0}
-      onKeyDown={e => e.key === "Enter" && onClick()}>
+    onKeyDown={(e) => e.key === "Enter" && onClick()}>
       <img className="mark-img" src="images/bbyo-menorah.png" alt="BBYO" />
       <div className="stack">
         <span className="wm">Rise Together</span>
-        <span className="sub">A BBYO Program</span>
+        <span className="sub">A BBYO INITIATIVE</span>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 /* ---------- Guided flow bar ---------- */
 function FlowBar({ route, nav }) {
   const steps = [
-    { id: "find", n: 1, label: "Find" },
-    { id: "write", n: 2, label: "Write" },
-  ];
-  const idx = steps.findIndex(s => s.id === route);
+  { id: "find", n: 1, label: "Find" },
+  { id: "write", n: 2, label: "Write" }];
+
+  const idx = steps.findIndex((s) => s.id === route);
   return (
     <div className="wrap" style={{ paddingTop: 22, paddingBottom: 2, display: "flex", justifyContent: "center" }}>
       <div className="flowbar" role="navigation" aria-label="Guided journey progress">
@@ -41,53 +41,53 @@ function FlowBar({ route, nav }) {
             <button key={s.id} className={`flowstep ${state}`} onClick={() => nav(s.id, { guided: true })}>
               <span className="dot">{i < idx ? <Icon name="check" size={14} stroke={3} /> : s.n}</span>
               {s.label}
-            </button>
-          );
+            </button>);
+
         })}
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 /* ---------- Nav ---------- */
 function Nav({ route, nav, guided }) {
   const [open, setOpen] = useS(false);
-  useE(() => { setOpen(false); }, [route]);
+  useE(() => {setOpen(false);}, [route]);
   return (
     <>
       <header className="nav">
         <div className="nav-inner">
           <Logo onClick={() => nav("home")} />
           <nav className="nav-links" aria-label="Primary">
-            {NAV_LINKS.map(id => (
-              <a key={id} className={route === id ? "active" : ""} onClick={() => nav(id)}>
-                {ROUTES.find(r => r.id === id).label}
+            {NAV_LINKS.map((id) =>
+            <a key={id} className={route === id ? "active" : ""} onClick={() => nav(id)}>
+                {ROUTES.find((r) => r.id === id).label}
               </a>
-            ))}
+            )}
           </nav>
           <div className="nav-cta">
             <Button className="hide-sm" chevron onClick={() => nav("find", { guided: true })}>Get started</Button>
-            <button className="burger" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(o => !o)}>
+            <button className="burger" aria-label="Menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
               <Icon name={open ? "x" : "menu"} size={24} />
             </button>
           </div>
         </div>
       </header>
-      {open && (
-        <div className="mobile-menu fadein">
-          {NAV_LINKS.map(id => (
-            <a key={id} className={route === id ? "active" : ""} onClick={() => nav(id)}>
-              {ROUTES.find(r => r.id === id).label}
+      {open &&
+      <div className="mobile-menu fadein">
+          {NAV_LINKS.map((id) =>
+        <a key={id} className={route === id ? "active" : ""} onClick={() => nav(id)}>
+              {ROUTES.find((r) => r.id === id).label}
             </a>
-          ))}
+        )}
           <div style={{ padding: "16px 24px" }}>
             <Button className="block" chevron onClick={() => nav("find", { guided: true })}>Get started</Button>
           </div>
         </div>
-      )}
+      }
       {guided && NAV_LINKS.includes(route) && ["find", "write"].includes(route) && <FlowBar route={route} nav={nav} />}
-    </>
-  );
+    </>);
+
 }
 
 /* ---------- Footer ---------- */
@@ -110,9 +110,9 @@ function Footer({ nav }) {
           </div>
           <div>
             <h4>Explore</h4>
-            {["home", "how"].map(id => (
-              <a key={id} onClick={() => nav(id)}>{ROUTES.find(r => r.id === id).label}</a>
-            ))}
+            {["home", "how"].map((id) =>
+            <a key={id} onClick={() => nav(id)}>{ROUTES.find((r) => r.id === id).label}</a>
+            )}
           </div>
           <div>
             <h4>The tools</h4>
@@ -125,23 +125,23 @@ function Footer({ nav }) {
           Rise Together is non-partisan and welcomes chapters and leaders across the political spectrum. © {new Date().getFullYear()} BBYO · A prototype for the Rise Together program.
         </p>
       </div>
-    </footer>
-  );
+    </footer>);
+
 }
 
 /* ---------- App / router ---------- */
 function App() {
   const [route, setRoute] = useS("home");
   const [guided, setGuided] = useS(false);
-  const [official, setOfficial] = useS(null);          // carried Find -> Write
-  const [writePrefill, setWritePrefill] = useS(null);  // {type}
+  const [official, setOfficial] = useS(null); // carried Find -> Write
+  const [writePrefill, setWritePrefill] = useS(null); // {type}
   const [connections, setConnections] = useS(() => {
-    try { const s = localStorage.getItem("rt_connections"); if (s) return JSON.parse(s); } catch (e) {}
+    try {const s = localStorage.getItem("rt_connections");if (s) return JSON.parse(s);} catch (e) {}
     return SAMPLE_CONNECTIONS;
   });
   const [toast, toastNode] = useToast();
 
-  useE(() => { try { localStorage.setItem("rt_connections", JSON.stringify(connections)); } catch (e) {} }, [connections]);
+  useE(() => {try {localStorage.setItem("rt_connections", JSON.stringify(connections));} catch (e) {}}, [connections]);
   useE(() => {
     // Always open on Home, even when the shared URL carries a #deep-link (e.g. #write).
     if (location.hash) history.replaceState(null, "", location.pathname + location.search);
@@ -158,18 +158,18 @@ function App() {
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
-  const addConnection = (c) => setConnections(list => [{ ...c, id: "c" + Date.now() }, ...list]);
-  const updateConnection = (id, patch) => setConnections(list => list.map(c => c.id === id ? { ...c, ...patch } : c));
-  const deleteConnection = (id) => setConnections(list => list.filter(c => c.id !== id));
+  const addConnection = (c) => setConnections((list) => [{ ...c, id: "c" + Date.now() }, ...list]);
+  const updateConnection = (id, patch) => setConnections((list) => list.map((c) => c.id === id ? { ...c, ...patch } : c));
+  const deleteConnection = (id) => setConnections((list) => list.filter((c) => c.id !== id));
   const resetConnections = () => setConnections(SAMPLE_CONNECTIONS);
 
   const ctx = {
     nav, guided, setGuided, official, setOfficial, writePrefill, setWritePrefill,
-    connections, addConnection, updateConnection, deleteConnection, resetConnections, toast,
+    connections, addConnection, updateConnection, deleteConnection, resetConnections, toast
   };
 
   const Page = {
-    home: HomePage, how: HowPage, find: FindPage, write: WritePage,
+    home: HomePage, how: HowPage, find: FindPage, write: WritePage
   }[route] || HomePage;
 
   return (
@@ -180,8 +180,8 @@ function App() {
       </main>
       <Footer nav={nav} />
       {toastNode}
-    </>
-  );
+    </>);
+
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);

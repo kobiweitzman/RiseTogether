@@ -542,6 +542,7 @@ a.cc:hover{color:var(--blue);}
 .email-meta{padding:16px 18px;border-bottom:1px solid var(--gray-line);display:flex;flex-direction:column;gap:8px;}
 .email-row{display:flex;gap:14px;font-size:14.5px;}
 .em-lab{flex:0 0 64px;color:var(--gray);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.04em;padding-top:1px;}
+.to-email{font-family:var(--font-mono,ui-monospace,monospace);font-size:13px;background:var(--cloud);border:1px solid var(--gray-line);border-radius:6px;padding:2px 8px;color:var(--blue-deep);}
 .email-body{margin:0;padding:22px 20px;font-family:var(--font-body);font-size:15px;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-wrap:break-word;}
 .email-panel textarea.input{margin:14px;width:calc(100% - 28px);border-radius:var(--r-sm);}
 .email-foot{padding:12px 20px;border-top:1px solid var(--gray-line);background:var(--cloud);}
