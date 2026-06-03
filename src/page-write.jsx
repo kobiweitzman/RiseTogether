@@ -165,9 +165,9 @@ function WritePage({ ctx }) {
               {F("city", "Your city", { ph: "e.g. Bethesda, MD" })}
               {type === "invite" && (
                 <React.Fragment>
-                  <div className="invite-extra-head" style={{ gridColumn: "1 / -1" }}>
-                    <span className="lab" style={{ textTransform: "uppercase", letterSpacing: ".05em", fontSize: 12, opacity: .7 }}>Meeting details</span>
-                    <span className="help" style={{ marginTop: 3 }}>The more an official knows up front, the easier it is to say yes. All optional, but each one makes the invitation stronger.</span>
+                  <div className="invite-extra-head" style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 5, marginTop: 10, paddingTop: 18, borderTop: "1px solid var(--gray-line)" }}>
+                    <span style={{ textTransform: "uppercase", letterSpacing: ".06em", fontSize: 12, fontWeight: 700, color: "var(--blue-deep)" }}>Meeting details</span>
+                    <span style={{ fontSize: 13.5, lineHeight: 1.5, color: "var(--gray)", maxWidth: 620 }}>The more an official knows up front, the easier it is to say yes. All optional, but each one makes the invitation stronger.</span>
                   </div>
                   <label className="field" style={{ margin: 0, gridColumn: "1 / -1" }}>
                     <span className="lab">Where you meet <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></span>

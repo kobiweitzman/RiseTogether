@@ -342,13 +342,13 @@ function FindPage({ ctx }) {
             <div className="level-group">
               <div className="level-head"><span className="level federal">Federal</span><span className="small muted">{levelMeta.Federal.desc}</span></div>
               <div className="grid offgrid">
+                {results.house
+                  ? <OfficialCard o={results.house} level="Federal" matched={isMatch(results.house)} ctx={ctx} />
+                  : <LookupCard cfg={LOOKUP_LINKS.house} loc={{ state: results.state }} matched={levelMatch("Federal")} onManual={openManual} />}
                 {results.senators.map(o => (
                   <OfficialCard key={o.id} o={o} level="Federal" matched={isMatch(o)} ctx={ctx} />
                 ))}
                 {!results.senators.length && <LookupCard cfg={LOOKUP_LINKS.senate} loc={{ state: results.state }} matched={levelMatch("Federal")} onManual={openManual} />}
-                {results.house
-                  ? <OfficialCard o={results.house} level="Federal" matched={isMatch(results.house)} ctx={ctx} />
-                  : <LookupCard cfg={LOOKUP_LINKS.house} loc={{ state: results.state }} matched={levelMatch("Federal")} onManual={openManual} />}
               </div>
             </div>
 
