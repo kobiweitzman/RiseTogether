@@ -588,6 +588,19 @@ Could we find fifteen minutes in the coming weeks? We will gladly come to you an
 ${sign}`,
     };
   }
+  // Logistics so the official has everything they need to say yes.
+  const mWhen = f.meetWhen && f.meetWhen.trim();
+  const mWhere = f.meetWhere && f.meetWhere.trim();
+  const mSize = f.meetSize && f.meetSize.trim();
+  const meetLines = [];
+  if (mWhen || mWhere) {
+    let l = "We gather";
+    if (mWhen) l += ` ${mWhen}`;
+    if (mWhere) l += `${mWhen ? ", " : " "}at ${mWhere}`;
+    meetLines.push(l + ".");
+  }
+  if (mSize) meetLines.push(`A typical gathering brings together around ${mSize} teens.`);
+  const logistics = meetLines.length ? ` ${meetLines.join(" ")}` : "";
   return {
     subject: `An invitation from ${chapter} to meet our teens`,
     body:
@@ -595,7 +608,7 @@ ${sign}`,
 
 ${intro1}
 
-We would be honored to host you, or a member of your team, at one of our chapter gatherings${f.meeting ? `, ${f.meeting.trim()}` : ""}. You would meet a room full of thoughtful, driven young people who care deeply about their community, and who would be genuinely glad to know the leader who represents them.${incident}
+We would be honored to host you, or a member of your team, at one of our chapter gatherings.${logistics} You would meet a room full of thoughtful, driven young people who care deeply about their community, and who would be genuinely glad to know the leader who represents them.${incident}
 
 ${stakes} Spending even a short time with our chapter sends a powerful message: that the people who represent us see us, value us, and stand with us. It would mean a great deal, and we think you would enjoy it.
 

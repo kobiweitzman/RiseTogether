@@ -7,7 +7,7 @@ function WritePage({ ctx }) {
 
   const [picker, setPicker] = React.useState({ level: "Local", name: "", role: "" });
   const [type, setType] = React.useState(writePrefill?.type || null);
-  const [fields, setFields] = React.useState({ chapter: "", name: "", role: "Chapter member", age: "", city: "", grade: "", meeting: "", incident: "" });
+  const [fields, setFields] = React.useState({ chapter: "", name: "", role: "Chapter member", age: "", city: "", grade: "", meetWhere: "", meetWhen: "", meetSize: "", incident: "" });
   const [generated, setGenerated] = React.useState(false);
   const [editing, setEditing] = React.useState(false);
   const [draft, setDraft] = React.useState("");
@@ -133,10 +133,24 @@ function WritePage({ ctx }) {
               {F("role", "Your role", { ph: "e.g. Chapter President" })}
               {F("city", "Your city", { ph: "e.g. Bethesda, MD" })}
               {type === "invite" && (
-                <label className="field" style={{ margin: 0, gridColumn: "1 / -1" }}>
-                  <span className="lab">Meeting details</span>
-                  <input className="input" placeholder="e.g. on the third Sunday of each month at the JCC" value={fields.meeting} onChange={e => setFields({ ...fields, meeting: e.target.value })} />
-                </label>
+                <React.Fragment>
+                  <div className="invite-extra-head" style={{ gridColumn: "1 / -1" }}>
+                    <span className="lab" style={{ textTransform: "uppercase", letterSpacing: ".05em", fontSize: 12, opacity: .7 }}>Meeting details</span>
+                    <span className="help" style={{ marginTop: 3 }}>The more an official knows up front, the easier it is to say yes. All optional, but each one makes the invitation stronger.</span>
+                  </div>
+                  <label className="field" style={{ margin: 0, gridColumn: "1 / -1" }}>
+                    <span className="lab">Where you meet <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></span>
+                    <input className="input" placeholder="e.g. the Bender JCC, 6125 Montrose Rd, Rockville" value={fields.meetWhere} onChange={e => setFields({ ...fields, meetWhere: e.target.value })} />
+                  </label>
+                  <label className="field" style={{ margin: 0 }}>
+                    <span className="lab">When you meet <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></span>
+                    <input className="input" placeholder="e.g. the third Sunday each month, 7pm" value={fields.meetWhen} onChange={e => setFields({ ...fields, meetWhen: e.target.value })} />
+                  </label>
+                  <label className="field" style={{ margin: 0 }}>
+                    <span className="lab">Average attendance <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></span>
+                    <input className="input" type="number" min="1" placeholder="e.g. 30" value={fields.meetSize} onChange={e => setFields({ ...fields, meetSize: e.target.value.replace(/[^0-9]/g, "") })} />
+                  </label>
+                </React.Fragment>
               )}
               <label className="field" style={{ margin: 0, gridColumn: "1 / -1" }}>
                 <span className="lab">Reference a local incident <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></span>
