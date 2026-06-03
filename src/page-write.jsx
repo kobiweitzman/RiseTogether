@@ -34,8 +34,17 @@ function WritePage({ ctx }) {
   };
 
   const openMail = () => {
-    const url = `mailto:${activeOfficial.contacts?.email || ""}?subject=${encodeURIComponent(email.subject)}&body=${encodeURIComponent(bodyText)}`;
-    window.location.href = url;
+    const url = "https://mail.google.com/mail/?view=cm&fs=1"
+      + "&to=" + encodeURIComponent(activeOfficial.contacts?.email || "")
+      + "&su=" + encodeURIComponent(email.subject)
+      + "&body=" + encodeURIComponent(bodyText);
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   };
 
   const F = (k, label, opts = {}) => (
@@ -177,7 +186,7 @@ function WritePage({ ctx }) {
             {/* actions */}
             <div className="email-actions">
               <Button icon="copy" onClick={copy}>Copy email</Button>
-              <Button variant="secondary" icon="send" onClick={openMail}>Open in email app</Button>
+              <Button variant="secondary" icon="send" onClick={openMail}>Open in Gmail</Button>
             </div>
           </div>
         )}
