@@ -131,7 +131,7 @@ function Footer({ nav }) {
 
 /* ---------- App / router ---------- */
 function App() {
-  const [route, setRoute] = useS(() => (location.hash.replace("#", "") || "home"));
+  const [route, setRoute] = useS("home");
   const [guided, setGuided] = useS(false);
   const [official, setOfficial] = useS(null);          // carried Find -> Write
   const [writePrefill, setWritePrefill] = useS(null);  // {type}
@@ -143,6 +143,8 @@ function App() {
 
   useE(() => { try { localStorage.setItem("rt_connections", JSON.stringify(connections)); } catch (e) {} }, [connections]);
   useE(() => {
+    // Always open on Home, even when the shared URL carries a #deep-link (e.g. #write).
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
     const onHash = () => setRoute(location.hash.replace("#", "") || "home");
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
