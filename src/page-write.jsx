@@ -15,7 +15,10 @@ function WritePage({ ctx }) {
 
   const activeOfficial = official || (picker.name.trim() ? { name: picker.name, role: picker.role, level: picker.level, contacts: {} } : null);
   const level = activeOfficial?.level || "Local";
-  const canGenerate = !!activeOfficial && !!type && fields.chapter.trim() && fields.name.trim();
+  // Sequential gating: each step unlocks only once the one before it is complete.
+  const stepADone = !!activeOfficial;
+  const stepBDone = stepADone && !!type;
+  const canGenerate = stepBDone && fields.chapter.trim() && fields.name.trim();
 
   const email = canGenerate ? buildEmail({ type, official: activeOfficial, fields }) : null;
   const bodyText = editing ? draft : (email?.body || "");
@@ -138,25 +141,40 @@ function WritePage({ ctx }) {
         </div>
 
         {/* STEP B, CONNECTION TYPE */}
-        <div className="wstep">
-          <div className="wstep-label"><span className="wstep-n">B</span> What kind of connection?</div>
-          <div className="conn-grid">
-            {CONNECTION_TYPES.map(t => (
-              <button key={t.id} className={`conncard ${type === t.id ? "on" : ""}`} onClick={() => setType(t.id)}>
-                <div className="conncard-top">
-                  <span className="rungtag">Level {t.rung}</span>
-                </div>
-                <div className="conn-title">{t.label}</div>
-                <div className="conn-sub">{t.sub}</div>
-                {type === t.id && <div className="conn-check"><Icon name="check" size={15} stroke={3} /></div>}
-              </button>
-            ))}
+        <div className={`wstep ${stepADone ? "" : "locked"}`}>
+          <div className="wstep-label">
+            <span className={`wstep-n ${stepADone ? "is-done" : "is-locked"}`}>{stepADone ? "B" : <Icon name="lock" size={14} />}</span> What kind of connection?
           </div>
+          {stepADone ? (
+            <div className="conn-grid">
+              {CONNECTION_TYPES.map(t => (
+                <button key={t.id} className={`conncard ${type === t.id ? "on" : ""}`} onClick={() => setType(t.id)}>
+                  <div className="conncard-top">
+                    <span className="rungtag">Level {t.rung}</span>
+                  </div>
+                  <div className="conn-title">{t.label}</div>
+                  <div className="conn-sub">{t.sub}</div>
+                  {type === t.id && <div className="conn-check"><Icon name="check" size={15} stroke={3} /></div>}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="lockcard">
+              <div className="lock-ico"><Icon name="lock" size={19} /></div>
+              <div>
+                <div className="lockcard-title">Choose who you're writing to first</div>
+                <div className="lockcard-sub">Finish step A and this unlocks.</div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* STEP C, FIELDS */}
-        <div className="wstep">
-          <div className="wstep-label"><span className="wstep-n">C</span> Fill in the blanks</div>
+        <div className={`wstep ${stepBDone ? "" : "locked"}`}>
+          <div className="wstep-label">
+            <span className={`wstep-n ${stepBDone ? "is-done" : "is-locked"}`}>{stepBDone ? "C" : <Icon name="lock" size={14} />}</span> Fill in the blanks
+          </div>
+          {stepBDone ? (
           <div className="card pad">
             <div className="manual-grid">
               {F("chapter", "Chapter name", { ph: "e.g. Liberty Bell BBYO" })}
@@ -199,6 +217,15 @@ function WritePage({ ctx }) {
               </div>
             )}
           </div>
+          ) : (
+            <div className="lockcard">
+              <div className="lock-ico"><Icon name="lock" size={19} /></div>
+              <div>
+                <div className="lockcard-title">Pick a connection type first</div>
+                <div className="lockcard-sub">Finish step B and the fields unlock.</div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* OUTPUT */}
